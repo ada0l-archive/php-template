@@ -1,0 +1,37 @@
+version: "2"
+services:
+    www:
+        build: ./docker/php
+        ports: 
+            - "8001:80"
+        volumes:
+            - ./www:/var/www/html/
+        links:
+            - db
+        networks:
+            - default
+        environment:
+            DB_URL: 'db'
+            DB_DATABASE: 'postgres'
+            DB_PORT: '5432'
+            DB_USER: 'postgres'
+            DB_PASSWORD: 'postgres'
+
+    db:
+        build: ./docker/psql
+        ports: 
+            - "5432:5432"
+        environment:
+            POSTGRES_PASSWORD: postgres
+        volumes:
+            - ./dump:/docker-entrypoint-initdb.d
+            - persistent:/var/lib/mysql
+        networks:
+            - default
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+          - 8080:8080
+volumes:
+    persistent:
